@@ -92,7 +92,7 @@ let saveDetailInfoDoctor =(inputData) =>{
                         doctorInfo.doctorId=inputData.doctorId;
                         doctorInfo.priceId= inputData.selectedPrice;
                         doctorInfo.paymentId= inputData.selectedPayment;
-                        doctorInfo.province= inputData.selectedProvince;
+                        doctorInfo.provinceId= inputData.selectedProvince;
                         doctorInfo.nameClinic= inputData.nameClinic;
                         doctorInfo.addressClinic= inputData.addressClinic;
                         doctorInfo.note= inputData.note;
@@ -102,7 +102,7 @@ let saveDetailInfoDoctor =(inputData) =>{
                             doctorId:inputData.doctorId,
                             priceId: inputData.selectedPrice,
                             paymentId:inputData.selectedPayment,
-                            province: inputData.selectedProvince,
+                            provinceId: inputData.selectedProvince,
                             nameClinic:inputData.nameClinic,
                             addressClinic: inputData.addressClinic,
                             note: inputData.note,
@@ -137,8 +137,15 @@ let getDetailDoctorById =(inputId) =>{
                     include:[
                         { model: db.Allcode, as:'positionData',attributes: ['valueEn','valueVi']},
                         { model: db.markdown,attributes: ['contentMarkdown','contentHTML','description']},
-                        
+                        { model: db.Doctor_info,attributes:{exclude: ['id','doctorId']},
+                        include:[
+                            { model: db.Allcode, as:'priceTypeData',attributes: ['valueEn','valueVi']},
+                            { model: db.Allcode, as:'paymentTypeData',attributes: ['valueEn','valueVi']},
+                            { model: db.Allcode, as:'provinceTypeData',attributes: ['valueEn','valueVi']},   
+                        ]},
+                            
                     ],
+                    
                     raw: false,
                     nest:true
                 })
@@ -235,9 +242,48 @@ let getDetailDoctorByDate = (doctorId,date)=>{
       }  
     })
 }
+let getExtraInfoDoctorById = (doctorId)=>{
+    return new Promise(async(resolve, reject) => {
+        try {
+            if (!doctorId) {
+                resolve({
+                    errCode:1,
+                    errMessage:'Missing required parameter !!!'
+                }) 
+            }else{
+                let data =await db.Doctor_info.findOne({
+                    where:{
+                        doctorId:doctorId
+                    },
+                    attributes:{exclude:['id','doctorId']},
+                    include:[
+                        { model: db.Allcode, as:'priceTypeData',attributes: ['valueEn','valueVi']},
+                        { model: db.Allcode, as:'paymentTypeData',attributes: ['valueEn','valueVi']},
+                        { model: db.Allcode, as:'provinceTypeData',attributes: ['valueEn','valueVi']},   
+                    ],
+                    raw: false, 
+                    nest:true
+                })
+                console.log('check data',data)
+                if (!data) {
+                    data={};
+                }else{ 
+                    resolve({
+                    errCode:0,
+                    data:data
+                })
+                }
+            }
+            
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
 module.exports ={
     getTopDoctorHome:getTopDoctorHome,
     getAllDoctors:getAllDoctors,bulkCreateSchedule:bulkCreateSchedule,
     saveDetailInfoDoctor:saveDetailInfoDoctor,getDetailDoctorById:getDetailDoctorById,
-    getDetailDoctorByDate:getDetailDoctorByDate
+    getDetailDoctorByDate:getDetailDoctorByDate,
+    getExtraInfoDoctorById:getExtraInfoDoctorById
 }
