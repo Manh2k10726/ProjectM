@@ -150,7 +150,7 @@ let getDetailDoctorById =(inputId) =>{
                     nest:true
                 })
                 if(data && data.image){
-                    data.image = new Buffer.from(data.image,'base64').toString('binary');
+                    data.image = new Buffer(data.image,'base64').toString('binary');
                 }
                 if(!data ) data={};
                 
@@ -225,6 +225,7 @@ let getDetailDoctorByDate = (doctorId,date)=>{
                     date: date
                 },
                 include:[
+                    { model: db.User, as:'doctorData',attributes: ['firstName','lastName']},    
                     { model: db.Allcode, as:'timeTypeData',attributes: ['valueEn','valueVi']},    
                 ],
                 raw: false,
@@ -280,10 +281,61 @@ let getExtraInfoDoctorById = (doctorId)=>{
         }
     })
 }
+let getProfileDoctorById = (inputId)=>{
+    return new Promise(async(resolve, reject) => {
+        try {
+            if (!inputId) {
+                resolve({
+                    errCode:1,
+                    errMessage:'Missing required parameter !!!'
+                }) 
+            }else{
+                let data =await db.User.findOne({
+                    where:{
+                        id:inputId
+                    },
+                    attributes:{
+                        exclude:['password']
+                    },
+                    include:[
+                        { model: db.Allcode, as:'positionData',attributes: ['valueEn','valueVi']},
+                        { model: db.markdown,attributes: ['contentMarkdown','contentHTML','description']},
+                        { model: db.Doctor_info,attributes:{exclude: ['id','doctorId']},
+                        include:[
+                            { model: db.Allcode, as:'priceTypeData',attributes: ['valueEn','valueVi']},
+                            { model: db.Allcode, as:'paymentTypeData',attributes: ['valueEn','valueVi']},
+                            { model: db.Allcode, as:'provinceTypeData',attributes: ['valueEn','valueVi']},   
+                        ]},
+                            
+                    ],
+                    
+                    raw: false,
+                    nest:true
+                })
+                console.log('check data',data)
+                if(data && data.image){
+                    data.image = new Buffer(data.image,'base64').toString('binary');
+                }
+                if (!data) {
+                    data={};
+                }else{ 
+                    resolve({
+                    errCode:0,
+                    data:data
+                })
+                }
+            }
+            
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
 module.exports ={
     getTopDoctorHome:getTopDoctorHome,
     getAllDoctors:getAllDoctors,bulkCreateSchedule:bulkCreateSchedule,
     saveDetailInfoDoctor:saveDetailInfoDoctor,getDetailDoctorById:getDetailDoctorById,
     getDetailDoctorByDate:getDetailDoctorByDate,
-    getExtraInfoDoctorById:getExtraInfoDoctorById
+    getExtraInfoDoctorById:getExtraInfoDoctorById,
+    getProfileDoctorById:getProfileDoctorById
 }
