@@ -40,9 +40,9 @@ let sendSimpleEmail =async (dataSend) =>{
       <div><b>Time: ${dataSend.time}</b></div>
       <div><b>Doctor: ${dataSend.doctorName}</b></div>
       <p>If the other information is true, please click on the link below to verify and complete the procedure</p>
-        <div>
-        <a href=${dataSend.redirectLink} target="_blank>Click here</a>
-        </div>
+      <div>
+        <a href=${dataSend.redirectLink} target="_blank"> Click here </a>
+      </div>
     <div>Sincerely thank !!!</div>
       `
     }
@@ -55,9 +55,9 @@ let sendSimpleEmail =async (dataSend) =>{
         <div><b>Thời gian: ${dataSend.time}</b></div>
         <div><b>Bác sĩ: ${dataSend.doctorName}</b></div>
         <p>Nếu các thông tin kia là đúng sự thật , vùi lòng nhấn vào đường link bên dưới để xác thực và hoàn tất thủ tục</p>
-          <div>
-          <a href=${dataSend.redirectLink} target="_blank>Click here</a>
-          </div>
+        <div>
+            <a href=${dataSend.redirectLink} target="_blank"> Click here </a>
+        </div>
       <div>Xin chân thành cảm ơn !!!</div>
         `  
     }

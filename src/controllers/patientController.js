@@ -12,6 +12,18 @@ let postBookAppointment = async(req,res)=>{
         })
      }
 }
+let postVerifyBookAppointment = async (req,res)=>{
+   try {
+      let info = await patientServices.postVerifyBookAppointment(req.body);
+      return res.status(200).json(info);
+   } catch (e) {
+      return res.status(200).json({
+         errCode:-1,
+         errMessage:'Error from the sever'
+      })
+   }
+}
 module.exports = {
-    postBookAppointment:postBookAppointment
+    postBookAppointment:postBookAppointment,
+    postVerifyBookAppointment:postVerifyBookAppointment
 }

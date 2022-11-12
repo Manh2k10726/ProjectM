@@ -1,9 +1,14 @@
 import db from "../models/index";
 import _ from 'lodash';
-import user from "../models/user";
+
 import emailServices from './emailServices'
+import {v4 as uuidv4} from 'uuid'
 require('dotenv').config();
 
+let buildUrlEmail = (doctorId,token)=>{
+    let result =`${process.env.URL_REACT}/verify-booking?token=${token}&doctorId=${doctorId}`;
+    return result;
+}
 let postBookAppointment =(data) =>{
     return new Promise(async (resolve, reject) => {
         try {
@@ -13,13 +18,16 @@ let postBookAppointment =(data) =>{
                     errMessage:'Missing parameter'
                 })
             }else{
+
+                let token= uuidv4();
+
                 await emailServices.sendSimpleEmail({
                     receiverEmail:data.email,
                     patientName:data.fullName,
                     time:data.timeString,
                     doctorName:data.doctorName,
                     language:data.language,
-                    redirectLink:"https://youtu.be/qEWFxJlmqlg"
+                    redirectLink: `${buildUrlEmail(data.doctorId,token)}`
                 })
                 // upsert patient
                 let user = await db.User.findOrCreate({
@@ -39,7 +47,8 @@ let postBookAppointment =(data) =>{
                             doctorId:data.doctorId,
                             patientId:user[0].id,
                             date:data.date,
-                            timeType:data.timeType
+                            timeType:data.timeType,
+                            token:token 
                         }
                     })
                 }
@@ -50,12 +59,50 @@ let postBookAppointment =(data) =>{
                 })
             }
             
-        } catch (error) {
-            
+        } catch (e) {
+            reject(e);
         }
     })
 }
+let postVerifyBookAppointment=(data)=>{
+    return new Promise(async(resolve, reject) => {
+        try {
+            if(!data.token || !data.doctorId ){
+                resolve({
+                    errCode:1,
+                    errMessage:'Missing parameter'
+                })
+            }else{
+                let appointment = await db.Booking.findOne({
+                    where:{
+                        doctorId:data.doctorId,
+                        token:data.token,
+                        statusId:'S1'
+                    },
+                    raw:false
+                })
+                if (appointment) {
+                    await appointment.save({
+                        statusId:'S2'
+                    })
+                    resolve({
+                        errCode: 0,
+                        errMessage:"Update the appointment succeed !"
+                    })
+                }else{
+                    resolve({
+                        errCode: 2,
+                        errMessage:"Appointment has been booked or is not valid !"
+                    })
+                }
+            }
+        } catch (e) {
+            reject(e);
+        }
+    })
+} 
 
 module.exports={
-    postBookAppointment:postBookAppointment
+    postBookAppointment:postBookAppointment,
+    postVerifyBookAppointment:postVerifyBookAppointment
 }
