@@ -1,5 +1,6 @@
 import db from "../models/index";
 import _ from 'lodash';
+import {Op} from 'sequelize';
 require('dotenv').config();
 
 const MAX_NUMBER_SCHEDULE =process.env.MAX_NUMBER_SCHEDULE;
@@ -331,11 +332,36 @@ let getProfileDoctorById = (inputId)=>{
         }
     })
 }
+let searchDataHome = (firstName)=>{
+    return new Promise(async(resolve, reject) => {
+        try {
+            if (!firstName) {
+                resolve({
+                    errCode:1,
+                    errMessage:'Missing required parameter !!!'
+                })}
+            let doctors =await db.User.findAll({
+                where: { firstName: { [Op.like]: '%'  } },
+                attributes:{
+                    exclude:['password','image']
+                },
+            })
+
+            resolve({
+                errCode:0,
+                data:doctors})
+            
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
 module.exports ={
     getTopDoctorHome:getTopDoctorHome,
     getAllDoctors:getAllDoctors,bulkCreateSchedule:bulkCreateSchedule,
     saveDetailInfoDoctor:saveDetailInfoDoctor,getDetailDoctorById:getDetailDoctorById,
     getDetailDoctorByDate:getDetailDoctorByDate,
     getExtraInfoDoctorById:getExtraInfoDoctorById,
-    getProfileDoctorById:getProfileDoctorById
+    getProfileDoctorById:getProfileDoctorById,
+    searchDataHome:searchDataHome
 }

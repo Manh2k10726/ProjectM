@@ -94,6 +94,17 @@ let getProfileDoctorById=async(req,res)=>{
       })
    }
 }
+let searchDataHome=async(req,res)=>{
+   try {
+      let info = await doctorService.searchDataHome(req.query.firstName);
+      return res.status(200).json(info);
+   } catch (e) {
+      return res.status(200).json({
+         errCode:-1,
+         errMessage:'Error from the sever'
+      })
+   }
+}
 module.exports = {
     getTopDoctorHome:getTopDoctorHome,
     getAllDoctors:getAllDoctors,
@@ -102,5 +113,6 @@ module.exports = {
     bulkCreateSchedule:bulkCreateSchedule,
     getDetailDoctorByDate:getDetailDoctorByDate,
     getExtraInfoDoctorById:getExtraInfoDoctorById,
-    getProfileDoctorById:getProfileDoctorById
+    getProfileDoctorById:getProfileDoctorById,
+    searchDataHome:searchDataHome
 }
