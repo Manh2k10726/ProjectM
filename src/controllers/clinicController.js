@@ -23,18 +23,19 @@ let getAllClinic=async(req,res)=>{
       })
    }
 }
-// let getDetailClinic=async(req,res)=>{
-//    try {
-//       let info = await ClinicServices.getDetailClinic(req.query.id,req.query.location);
-//         return res.status(200).json(info);
-//    } catch (e) {
-//       return res.status(200).json({
-//          errCode:-1,
-//          errMessage:'Error from the sever'
-//       })
-//    }
-// }
+let getDetailClinic=async(req,res)=>{
+   try {
+      let info = await clinicServices.getDetailClinic(req.query.id);
+        return res.status(200).json(info);
+   } catch (e) {
+      return res.status(200).json({
+         errCode:-1,
+         errMessage:'Error from the sever'
+      })
+   }
+}
 module.exports = {
     createClinic:createClinic,
-    getAllClinic:getAllClinic
+    getAllClinic:getAllClinic,
+    getDetailClinic:getDetailClinic
 }

@@ -51,51 +51,45 @@ let getAllClinic =()=>{
         }
     })
 }
-// let getDetailClinic = (inputId,location)=>{
-//     return new Promise(async(resolve, reject) => {
-//         try {
-//             if(!inputId || !location ){
-//                 resolve({
-//                     errCode:1,
-//                     errMessage:'Missing parameter'
-//                 })
-//             }else{
-//                 let data =await db.clinic.findOne({
-//                         where:{id:inputId},
-//                         attributes:['descriptionHTML','descriptionMarkdown','name'],
-//                     })
-//                     if (data) {
-//                         let doctorClinic =[];
-//                         if(location === 'ALL'){
-//                             doctorClinic = await db.Doctor_info.findAll({
-//                                 where:{ClinicId:inputId},
-//                                 attributes:['doctorId','provinceId',],
-//                             })
-//                         }else{
-//                             doctorClinic = await db.Doctor_info.findAll({
-//                                 where:{ClinicId:inputId,
-//                                         provinceId:location},
-//                                 attributes:['doctorId','provinceId',],
-//                             })
-//                         }
+let getDetailClinic = (inputId)=>{
+    return new Promise(async(resolve, reject) => {
+        try {
+            if(!inputId ){
+                resolve({
+                    errCode:1,
+                    errMessage:'Missing parameter'
+                })
+            }else{
+                let data =await db.clinic.findOne({
+                        where:{id:inputId},
+                        attributes:['descriptionHTML','descriptionMarkdown','name'],
+                    })
+                    if (data) {
+                        let doctorClinic =[];
+                       
+                            doctorClinic = await db.Doctor_info.findAll({
+                                where:{clinicId:inputId},
+                                attributes:['doctorId','provinceId',],
+                            })
+                        
                          
-//                         data.doctorClinic =doctorClinic
-//                     }else data={}
-//                     resolve({
-//                         errMessage:'Ok',
-//                         errCode:0,
-//                         data
-//                     })
+                        data.doctorClinic = doctorClinic
+                    }else data={}
+                    resolve({
+                        errMessage:'Ok',
+                        errCode:0,
+                        data
+                    })
                 
               
-//             }
-//         } catch (e) {
-//             reject(e)
-//         }
-//     })
-// }
+            }
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
 module.exports={
     createClinic:createClinic,
     getAllClinic:getAllClinic,
-//     getDetailClinic:getDetailClinic
+    getDetailClinic:getDetailClinic
 }
