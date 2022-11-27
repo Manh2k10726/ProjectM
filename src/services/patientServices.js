@@ -12,7 +12,8 @@ let buildUrlEmail = (doctorId,token)=>{
 let postBookAppointment =(data) =>{
     return new Promise(async (resolve, reject) => {
         try {
-            if(!data.email || !data.doctorId || !data.timeType || !data.date || !data.fullName){
+            if(!data.email || !data.doctorId || !data.timeType || !data.date || !data.fullName
+                || !data.selectedGender || !data.address){
                 resolve({
                     errCode:1,
                     errMessage:'Missing parameter'
@@ -34,7 +35,10 @@ let postBookAppointment =(data) =>{
                     where :{ email : data.email},
                     defaults:{
                         email: data.email,
-                        roleId:'R3'
+                        roleId:'R3',
+                        gender:data.selectedGender,
+                        address:data.address,
+                        firstName:data.fullName
                     }
                 });
                 console.log('check user :',user[0])
@@ -82,9 +86,8 @@ let postVerifyBookAppointment=(data)=>{
                     raw:false
                 })
                 if (appointment) {
-                    await appointment.save({
-                        statusId:'S2'
-                    })
+                    appointment.statusId = 'S2';
+                    await appointment.save();
                     resolve({
                         errCode: 0,
                         errMessage:"Update the appointment succeed !"

@@ -345,7 +345,7 @@ let getProfileDoctorById = (inputId)=>{
                     raw: false,
                     nest:true
                 })
-                console.log('check data',data)
+
                 if(data && data.image){
                     data.image = new Buffer(data.image,'base64').toString('binary');
                 }
@@ -364,16 +364,16 @@ let getProfileDoctorById = (inputId)=>{
         }
     })
 }
-let searchDataHome = (inputId)=>{
+let searchDataHome = (name)=>{
     return new Promise(async(resolve, reject) => {
         try {
-            if (!inputId) {
+            if (!name) {
                 resolve({
                     errCode:1,
                     errMessage:'Missing required parameter !!!'
                 })}
-            let doctors =await db.User.findAll({
-                where: { firstName: { [Op.like]: '%'+inputId.toLowerCase()+'%' },
+            let doctors =await db.Specialty.findAll({
+                where: { name: { [Op.like]: '%'+name.toLowerCase()+'%' },
                          },
                 attributes:{
                     exclude:['password','image']
@@ -389,6 +389,43 @@ let searchDataHome = (inputId)=>{
         }
     })
 }
+let getListPatientForDoctor = (doctorId,date)=>{
+    return new Promise(async(resolve, reject) => {
+        try {
+            if (!doctorId || !date) {
+                resolve({
+                    errCode:1,
+                    errMessage:'Missing required parameter !!!'
+                })}
+            let data =await db.Booking.findAll({
+                where: { statusId:'S2',
+                         doctorId:doctorId,
+                         date:date
+                         },
+                    include:[{
+                         model:db.User, as: 'patientData',
+                         attributes:['email','firstName','address','gender'],
+                         include:[{
+                            model:db.Allcode , as: 'genderData', attributes: ['valueVi','valueEn'] }
+                        ],
+                    },],
+                    raw: false,
+                    nest:true
+            })
+
+            if (!data) {
+                data={};
+            }else{ 
+                resolve({
+                errCode:0,
+                data:data
+            })}
+            
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
 module.exports ={
     getTopDoctorHome:getTopDoctorHome,
     getAllDoctors:getAllDoctors,bulkCreateSchedule:bulkCreateSchedule,
@@ -396,5 +433,6 @@ module.exports ={
     getDetailDoctorByDate:getDetailDoctorByDate,
     getExtraInfoDoctorById:getExtraInfoDoctorById,
     getProfileDoctorById:getProfileDoctorById,
-    searchDataHome:searchDataHome
+    searchDataHome:searchDataHome,
+    getListPatientForDoctor:getListPatientForDoctor
 }
