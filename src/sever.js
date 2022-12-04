@@ -11,6 +11,8 @@ let app = express();
 // app.use(cors({origin:true}));
 app.use(function(req,res,next){
     res.setHeader('Access-Control-Allow-Origin',process.env.URL_REACT);
+    // res.setHeader('Access-Control-Allow-Origin',   " http://localhost:3000"
+    // );
     res.setHeader('Access-Control-Allow-Methods','GET,POST,PUT,DELETE,PATCH,OPTION');
     res.setHeader('Access-Control-Allow-Headers','X-Requested-with,content-type');
     res.setHeader('Access-Control-Allow-Credentials',true);

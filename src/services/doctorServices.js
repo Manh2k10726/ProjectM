@@ -364,16 +364,16 @@ let getProfileDoctorById = (inputId)=>{
         }
     })
 }
-let searchDataHome = (name)=>{
+let searchDataHome = (inputName)=>{
     return new Promise(async(resolve, reject) => {
         try {
-            if (!name) {
+            if (!inputName) {
                 resolve({
                     errCode:1,
                     errMessage:'Missing required parameter !!!'
                 })}
-            let doctors =await db.Specialty.findAll({
-                where: { name: { [Op.like]: '%'+name.toLowerCase()+'%' },
+            let data =await db.Specialty.findAll({
+                where: { name: { [Op.like]: '%'+ inputName.toLowerCase()+'%' },
                          },
                 attributes:{
                     exclude:['password','image']
@@ -382,7 +382,7 @@ let searchDataHome = (name)=>{
 
             resolve({
                 errCode:0,
-                data:doctors})
+                data:data})
             
         } catch (e) {
             reject(e);
@@ -402,13 +402,18 @@ let getListPatientForDoctor = (doctorId,date)=>{
                          doctorId:doctorId,
                          date:date
                          },
-                    include:[{
-                         model:db.User, as: 'patientData',
-                         attributes:['email','firstName','address','gender'],
-                         include:[{
-                            model:db.Allcode , as: 'genderData', attributes: ['valueVi','valueEn'] }
+                    include:[
+                                {
+                                    model:db.User, as: 'patientData',
+                                    attributes:['email','firstName','address','gender'],
+                                    include:[{
+                                        model:db.Allcode , as: 'genderData', attributes: ['valueVi','valueEn'] }
+                                    ],
+                                },
+                                {
+                                    model:db.Allcode , as: 'timeTypeDataPt', attributes: ['valueVi','valueEn'] 
+                                }
                         ],
-                    },],
                     raw: false,
                     nest:true
             })

@@ -78,7 +78,7 @@ let getDetailSpecialty = (inputId,location)=>{
                             })
                         }
                          
-                        data.doctorSpecialty =doctorSpecialty
+                        data.doctorSpecialty = doctorSpecialty
                     }else data={}
                     resolve({
                         errMessage:'Ok',
